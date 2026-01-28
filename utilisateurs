@@ -1,0 +1,133 @@
+
+http://localhost:8000/api/users/register-with-otp/
+{
+  "email": "yixolo7816@sepole.com",
+  "password": "123456789",
+  "password_confirm": "123456789",
+  "first_name": "sepolo",
+  "last_name": "yixolo",
+  "phone": "03333333333",
+  "role": "CLIENT"
+}
+=> otp verification reussite
+
+http://localhost:8000/api/users/otp/verify/
+{
+  "email": "cokoso7993@sepole.com",
+  "code": "071780",
+  "purpose": "email_verification"
+}
+
+jimowo3713@sepole.com = PRESATAIRE PRENOM JIMOWO verification reussite
+cokoso7993@sepole.com = ADMIN
+
+curl -X 'POST' \
+  'http://localhost:8000/api/users/login/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'X-CSRFTOKEN: EicUnpnkyIak82tr7R2K0mmXSlxknbLU' \
+  -d '{
+  "email": "yixolo7816@sepole.com",
+  "password": "123456789"
+}'
+
+=> INSCRIPTION SUR LE PAGE:
+bicac46231@sepole.com => client
+validation otp ok
+conenxion automatique
+
+ceci le teste
+curl -X 'POST' \
+  'http://localhost:8000/api/users/login/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'X-CSRFTOKEN: EicUnpnkyIak82tr7R2K0mmXSlxknbLU' \
+  -d '{
+  "email": "bicac46231@sepole.com",
+  "password": "123456789"
+}' 
+
+réponse:
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY5MzI2MTAwLCJpYXQiOjE3NjkzMjUyMDAsImp0aSI6IjRmNzQyZDliOWEyMDRlNjRiMGNhNDM2NDA2YzJkYTBmIiwidXNlcl9pZCI6ImY4Yjk1MGFiLTMwODItNGVmNS1iOGUwLTZlZTMwMDhjNmNkOSJ9.ug3s__0JTREu-uvgYZtH-igRcbNB5FiOYjZRdCWS3DA",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2OTkzMDAwMCwiaWF0IjoxNzY5MzI1MjAwLCJqdGkiOiIxYzEyNzMzMDExZWU0NGUyOGQ1NmU2ZWJiODhlNmVlMiIsInVzZXJfaWQiOiJmOGI5NTBhYi0zMDgyLTRlZjUtYjhlMC02ZWUzMDA4YzZjZDkifQ.shN9XT5qGtVoTHVihHVa5Hz-cqTV6Kqqu3kNhNtjcvI",
+  "user": {
+    "id": "f8b950ab-3082-4ef5-b8e0-6ee3008c6cd9",
+    "password": "pbkdf2_sha256$1200000$ZSlwGgU3bb7ELDXkvMRwlg$aEjKPRQ5w7QELbzBDE9hjf2gMnW3/4aq+FnkLCI9xJc=",
+    "last_login": "2026-01-25T10:13:20.920596+03:00",
+    "is_superuser": false,
+    "email": "bicac46231@sepole.com",
+    "phone": null,
+    "role": "CLIENT",
+    "is_active": true,
+    "is_staff": false,
+    "email_verified": true,
+    "phone_verified": false,
+    "first_name": "Bicac",
+    "last_name": "Sepolo",
+    "profession": "",
+    "residence": "",
+    "cin_number": null,
+    "cin_photo_recto": null,
+    "cin_photo_verso": null,
+    "image": null,
+    "address": "",
+    "date_of_birth": null,
+    "date_joined": "2026-01-25T10:09:12.528869+03:00",
+    "updated_at": "2026-01-25T10:09:14.649349+03:00",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+-----------
+
+je fais une modification
+curl -X 'PUT' \
+  'http://localhost:8000/api/users/profile/f8b950ab-3082-4ef5-b8e0-6ee3008c6cd9/' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY5MzI2MTAwLCJpYXQiOjE3NjkzMjUyMDAsImp0aSI6IjRmNzQyZDliOWEyMDRlNjRiMGNhNDM2NDA2YzJkYTBmIiwidXNlcl9pZCI6ImY4Yjk1MGFiLTMwODItNGVmNS1iOGUwLTZlZTMwMDhjNmNkOSJ9.ug3s__0JTREu-uvgYZtH-igRcbNB5FiOYjZRdCWS3DA' \
+  -H 'Content-Type: multipart/form-data' \
+  -H 'X-CSRFTOKEN: EicUnpnkyIak82tr7R2K0mmXSlxknbLU' \
+  -F 'first_name=Bicac' \
+  -F 'last_name=Sepolo' \
+  -F 'phone=0332437129' \
+  -F 'profession=chanteur' \
+  -F 'residence=Lot ampandrana 14' \
+  -F 'cin_number=1234567899789' \
+  -F 'address=lot IIH 44 d soavimasoandro' \
+  -F 'date_of_birth=2019-12-5' \
+  -F 'image=@femme-souriante-lunettes_1308-177859.avif;type=image/avif' \
+  -F 'cin_photo_recto=@images2.jpeg;type=image/jpeg' \
+  -F 'cin_photo_verso=@images2.jpeg;type=image/jpeg'
+
+reponse: {
+  "id": "f8b950ab-3082-4ef5-b8e0-6ee3008c6cd9",
+  "password": "pbkdf2_sha256$1200000$ZSlwGgU3bb7ELDXkvMRwlg$aEjKPRQ5w7QELbzBDE9hjf2gMnW3/4aq+FnkLCI9xJc=",
+  "last_login": "2026-01-25T10:13:20.920596+03:00",
+  "is_superuser": false,
+  "email": "bicac46231@sepole.com",
+  "phone": "0332437129",
+  "role": "CLIENT",
+  "is_active": true,
+  "is_staff": false,
+  "email_verified": true,
+  "phone_verified": false,
+  "first_name": "Bicac",
+  "last_name": "Sepolo",
+  "profession": "chanteur",
+  "residence": "Lot ampandrana 14",
+  "cin_number": "1234567899789",
+  "cin_photo_recto": "/media/cin/photos/recto/images2.jpeg",
+  "cin_photo_verso": "/media/cin/photos/verso/images2.jpeg",
+  "image": "/media/profile/photos/femme-souriante-lunettes_1308-177859.avif",
+  "address": "lot IIH 44 d soavimasoandro",
+  "date_of_birth": "2019-12-05",
+  "date_joined": "2026-01-25T10:09:12.528869+03:00",
+  "updated_at": "2026-01-25T10:18:25.133480+03:00",
+  "groups": [],
+  "user_permissions": []
+}
+
+
+
+
