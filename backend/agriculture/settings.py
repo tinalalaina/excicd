@@ -74,11 +74,12 @@ ASGI_APPLICATION = "agriculture.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "agriculture"),
+        "NAME": os.getenv("DB_NAME", "xxxxxx"),
         "USER": os.getenv("DB_USER", "postgres"),
-        "PASSWORD": os.getenv("DB_PASS", "lalaina14"),
+        "PASSWORD": os.getenv("DB_PASS", ""),
         "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
+        "OPTIONS": {"sslmode": os.getenv("DB_SSLMODE", "prefer")},
     }
 }
 
