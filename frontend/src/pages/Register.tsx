@@ -25,7 +25,7 @@ const Register = () => {
         role,
       })
       setMessage('Compte créé. Vous pouvez vous connecter.')
-    } catch (err) {
+    } catch {
       setMessage('Inscription échouée. Merci de réessayer.')
     }
   }
