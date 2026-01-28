@@ -1,0 +1,23 @@
+creation de repositorie: excicd
+on va prendre le full stack qui marche deja
+on va cloner alors
+git clone git@github.com:tinalalaina/utiliisateur-avec-react-vite-et-django-et-postgresql-otp.git
+ls
+code .
+cd frontend
+npm run dev
+
+cd backend
+source .venv/bin/activate
+python manage.py runserver
+note il faut avoir .env ici
+
+donc ici on a 
+
+echo "# excicd" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:tinalalaina/excicd.git
+git push -u origin main
