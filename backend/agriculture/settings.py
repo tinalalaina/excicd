@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     # third-party
     "rest_framework",
     "rest_framework_simplejwt",
-    "drf_yasg",
+    "drf_spectacular",
     "corsheaders",
 
     # local
@@ -116,6 +116,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -156,14 +157,17 @@ EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 
 APPEND_SLASH = False
 
-SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {
-        "Bearer": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header",
-            "description": "Entrez exactement : Bearer <access_token>",
+SPECTACULAR_SETTINGS = {
+    "TITLE": "agriculture API",
+    "DESCRIPTION": "agriculture backend - Users + JWT",
+    "VERSION": "v1",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SECURITY": [{"BearerAuth": []}],
+    "SECURITY_SCHEMES": {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
         }
     },
-    "USE_SESSION_AUTH": False,
 }

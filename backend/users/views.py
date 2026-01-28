@@ -7,8 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema, OpenApiRequest
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -16,6 +15,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .models import User
 from .serializers import (
     UserRegistrationSerializer,
+    UserLoginSerializer,
     UserProfileSerializer,
     UserUpdateSerializer,
     CustomTokenRefreshSerializer,
@@ -24,32 +24,10 @@ from .serializers import (
 from .services import TokenService
 
 
-# ✅ Swagger: support multipart/form-data for profile (text + files)
-profile_form_params = [
-    openapi.Parameter("first_name", openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
-    openapi.Parameter("last_name", openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
-    openapi.Parameter("phone", openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
-    openapi.Parameter("profession", openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
-    openapi.Parameter("residence", openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
-    openapi.Parameter("cin_number", openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
-    openapi.Parameter("address", openapi.IN_FORM, type=openapi.TYPE_STRING, required=False),
-    openapi.Parameter(
-        "date_of_birth",
-        openapi.IN_FORM,
-        type=openapi.TYPE_STRING,
-        required=False,
-        description="YYYY-MM-DD",
-    ),
-    openapi.Parameter("image", openapi.IN_FORM, type=openapi.TYPE_FILE, required=False),
-    openapi.Parameter("cin_photo_recto", openapi.IN_FORM, type=openapi.TYPE_FILE, required=False),
-    openapi.Parameter("cin_photo_verso", openapi.IN_FORM, type=openapi.TYPE_FILE, required=False),
-]
-
-
 class UserRegistrationView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    @swagger_auto_schema(request_body=UserRegistrationSerializer)
+    @extend_schema(request=UserRegistrationSerializer)
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
@@ -69,16 +47,7 @@ class UserRegistrationView(APIView):
 class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=["email", "password"],
-            properties={
-                "email": openapi.Schema(type=openapi.TYPE_STRING),
-                "password": openapi.Schema(type=openapi.TYPE_STRING),
-            },
-        )
-    )
+    @extend_schema(request=UserLoginSerializer)
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
@@ -140,7 +109,7 @@ class UserProfileView(APIView):
         return Response(UserProfileSerializer(user).data, status=status.HTTP_200_OK)
 
     # ✅ PATCH ajouté (partial update) + swagger multipart (cin recto/verso + image)
-    @swagger_auto_schema(manual_parameters=profile_form_params, consumes=["multipart/form-data"])
+    @extend_schema(request=OpenApiRequest(UserUpdateSerializer, media_type="multipart/form-data"))
     def patch(self, request, user_id):
         user = self.get_user(user_id)
         serializer = UserUpdateSerializer(user, data=request.data, partial=True)
@@ -150,7 +119,7 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Tu peux garder PUT aussi (partial=True comme avant)
-    @swagger_auto_schema(manual_parameters=profile_form_params, consumes=["multipart/form-data"])
+    @extend_schema(request=OpenApiRequest(UserUpdateSerializer, media_type="multipart/form-data"))
     def put(self, request, user_id):
         user = self.get_user(user_id)
         serializer = UserUpdateSerializer(user, data=request.data, partial=True)
@@ -171,7 +140,7 @@ class UserProfilePhotoView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
-    @swagger_auto_schema(request_body=UserPhotoUploadSerializer, consumes=["multipart/form-data"])
+    @extend_schema(request=OpenApiRequest(UserPhotoUploadSerializer, media_type="multipart/form-data"))
     def post(self, request, user_id):
         user = get_object_or_404(User, id=user_id)
         serializer = UserPhotoUploadSerializer(user, data=request.data)
@@ -185,4 +154,3 @@ class UserProfilePhotoView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
