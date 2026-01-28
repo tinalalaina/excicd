@@ -1,11 +1,9 @@
 import { FormEvent, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import Card from '../components/Card'
 import FormField from '../components/FormField'
-import { registerWithOtp } from '../api/userService'
+import { registerUser } from '../api/userService'
 
 const Register = () => {
-  const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -18,7 +16,7 @@ const Register = () => {
     event.preventDefault()
     setMessage(null)
     try {
-      await registerWithOtp({
+      await registerUser({
         first_name: firstName,
         last_name: lastName,
         email,
@@ -26,7 +24,7 @@ const Register = () => {
         password_confirm: passwordConfirm,
         role,
       })
-      navigate('/otp-verify', { state: { email } })
+      setMessage('Compte créé. Vous pouvez vous connecter.')
     } catch (err) {
       setMessage('Inscription échouée. Merci de réessayer.')
     }
@@ -34,7 +32,7 @@ const Register = () => {
 
   return (
     <div className="page-grid">
-      <Card title="Inscription (OTP)">
+      <Card title="Inscription">
         <form onSubmit={handleRegister} className="form-grid">
           <FormField label="Prénom" htmlFor="register-first-name">
             <input
@@ -90,7 +88,7 @@ const Register = () => {
           </FormField>
           {message ? <div className="alert">{message}</div> : null}
           <button className="button button-primary" type="submit">
-            Recevoir mon code OTP
+            Créer mon compte
           </button>
         </form>
       </Card>

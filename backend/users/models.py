@@ -92,25 +92,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f"{self.first_name} {self.last_name}".strip()
 
 
-class OTPCode(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="otp_codes")
-    code = models.CharField(max_length=10)
-    purpose = models.CharField(max_length=50)  # email_verification | password_reset
-    is_used = models.BooleanField(default=False)
-    expires_at = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "otp_codes"
-        indexes = [
-            models.Index(fields=["user", "purpose", "is_used"]),
-        ]
-
-    def is_valid(self):
-        return (not self.is_used) and (timezone.now() < self.expires_at)
-
-
 class RefreshToken(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="refresh_tokens")

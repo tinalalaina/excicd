@@ -19,7 +19,7 @@ const Home = () => {
         <Card title="Ce que vous obtenez">
           <ul>
             <li>Gestion des demandes en un seul endroit.</li>
-            <li>Validation sécurisée via OTP pour les comptes.</li>
+            <li>Accès direct aux comptes dès l&apos;inscription.</li>
             <li>Trois dashboards dédiés: client, prestataire, admin.</li>
           </ul>
         </Card>

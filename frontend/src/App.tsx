@@ -8,7 +8,6 @@ import ClientDashboard from './pages/dashboards/ClientDashboard'
 import PrestataireDashboard from './pages/dashboards/PrestataireDashboard'
 import Home from './pages/Home'
 import Login from './pages/Login'
-import OtpVerify from './pages/OtpVerify'
 import Register from './pages/Register'
 import Settings from './pages/Settings'
 import './App.css'
@@ -20,7 +19,6 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/otp-verify" element={<OtpVerify />} />
         <Route
           path="/dashboard/client"
           element={

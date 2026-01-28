@@ -132,9 +132,6 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 
-# ✅ OTP
-OTP_VALIDITY_MINUTES = 15
-OTP_LENGTH = 6
 
 APPEND_SLASH = False
 

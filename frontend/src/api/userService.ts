@@ -24,26 +24,8 @@ export interface RegisterResponse {
   message?: string
 }
 
-export interface OtpVerifyPayload {
-  email: string
-  code: string
-  purpose: 'email_verification' | 'password_reset'
-}
-
-export interface PasswordResetPayload {
-  email: string
-  code: string
-  new_password: string
-  new_password_confirm: string
-}
-
-export const registerWithOtp = async (payload: RegisterPayload) => {
-  const { data } = await api.post<RegisterResponse>('/users/register-with-otp/', payload)
-  return data
-}
-
-export const verifyOtp = async (payload: OtpVerifyPayload) => {
-  const { data } = await api.post<LoginResponse>('/users/otp/verify/', payload)
+export const registerUser = async (payload: RegisterPayload) => {
+  const { data } = await api.post<RegisterResponse>('/users/register/', payload)
   return data
 }
 
@@ -81,15 +63,5 @@ export const uploadProfilePhoto = async (userId: string, payload: FormData) => {
       'Content-Type': 'multipart/form-data',
     },
   })
-  return data
-}
-
-export const requestPasswordReset = async (email: string) => {
-  const { data } = await api.post('/users/otp/request/', { email, purpose: 'password_reset' })
-  return data
-}
-
-export const resetPassword = async (payload: PasswordResetPayload) => {
-  const { data } = await api.post('/users/password/reset/', payload)
   return data
 }

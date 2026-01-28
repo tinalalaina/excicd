@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, get_user_model
 
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
-from .models import User, OTPCode, RefreshToken
+from .models import User, RefreshToken
 from agriculture.utils import delete_file
 
 
@@ -43,8 +43,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
-        user.email_verified = False
-        user.is_active = False
+        user.email_verified = True
+        user.is_active = True
         user.save()
         return user
 
@@ -63,10 +63,6 @@ class UserLoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("verifier votre email ou mot de passe.")
             if not user.is_active:
                 raise serializers.ValidationError("Compte est désactivé.")
-            if not user.email_verified:
-                raise serializers.ValidationError(
-                    "Veuillez vérifier votre email avant de vous connecter."
-                )
 
             attrs["user"] = user
             return attrs
@@ -111,17 +107,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class OTPRequestSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    purpose = serializers.ChoiceField(choices=["email_verification", "password_reset"])
-
-
-class OTPVerifySerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    code = serializers.CharField(max_length=10)
-    purpose = serializers.ChoiceField(choices=["email_verification", "password_reset"])
-
-
 class CustomTokenRefreshSerializer(TokenRefreshSerializer):
     def validate(self, attrs):
         try:
@@ -150,17 +135,3 @@ class UserPhotoUploadSerializer(serializers.Serializer):
         if value.content_type not in valid_types:
             raise serializers.ValidationError("Formats acceptés : JPG, PNG.")
         return value
-
-
-class PasswordResetWithOTPSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    code = serializers.CharField(max_length=6)
-    new_password = serializers.CharField(min_length=8)
-    new_password_confirm = serializers.CharField(min_length=8)
-
-    def validate(self, attrs):
-        if attrs["new_password"] != attrs["new_password_confirm"]:
-            raise serializers.ValidationError(
-                {"new_password_confirm": "Les mots de passe ne correspondent pas."}
-            )
-        return attrs

@@ -18,13 +18,10 @@ from .serializers import (
     UserRegistrationSerializer,
     UserProfileSerializer,
     UserUpdateSerializer,
-    OTPRequestSerializer,
-    OTPVerifySerializer,
     CustomTokenRefreshSerializer,
     UserPhotoUploadSerializer,
-    PasswordResetWithOTPSerializer,
 )
-from .services import OTPService, TokenService
+from .services import TokenService
 
 
 # ✅ Swagger: support multipart/form-data for profile (text + files)
@@ -58,12 +55,9 @@ class UserRegistrationView(APIView):
         if serializer.is_valid():
             user = serializer.save()
 
-            otp = OTPService.create_otp(user, "email_verification")
-            OTPService.send_otp_email(user, otp.code, "email_verification")
-
             return Response(
                 {
-                    "message": "Compte créé. Un code OTP a été envoyé à votre email.",
+                    "message": "Compte créé avec succès.",
                     "id": str(user.id),
                     "email": user.email,
                 },
@@ -99,9 +93,6 @@ class UserLoginView(APIView):
         if not user.is_active:
             return Response({"detail": "Compte inactif."}, status=status.HTTP_403_FORBIDDEN)
 
-        if not user.email_verified:
-            return Response({"detail": "Veuillez vérifier votre email avant de vous connecter."}, status=status.HTTP_400_BAD_REQUEST)
-
         # ✅ last_login (JWT login ne le met pas à jour automatiquement)
         user.last_login = timezone.now()
         user.save(update_fields=["last_login"])
@@ -121,72 +112,6 @@ class UserLoginView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
-
-class OTPRequestView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    @swagger_auto_schema(request_body=OTPRequestSerializer)
-    def post(self, request):
-        serializer = OTPRequestSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data["email"]
-            purpose = serializer.validated_data["purpose"]
-
-            user = User.objects.filter(email=email).first()
-            if not user:
-                return Response({"error": "Aucun utilisateur avec cet email."}, status=status.HTTP_404_NOT_FOUND)
-
-            otp = OTPService.create_otp(user, purpose)
-            OTPService.send_otp_email(user, otp.code, purpose)
-
-            return Response({"message": f"Code {purpose} envoyé avec succès."}, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class OTPVerifyView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    @swagger_auto_schema(request_body=OTPVerifySerializer)
-    def post(self, request):
-        serializer = OTPVerifySerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data["email"]
-            code = serializer.validated_data["code"]
-            purpose = serializer.validated_data["purpose"]
-
-            user = OTPService.verify_otp(email, code, purpose)
-            if not user:
-                return Response(
-                    {"error": "Code invalide ou expiré.", "verified": False},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            response_data = {"message": "Vérification réussie.", "verified": True}
-
-            if purpose == "email_verification":
-                user.email_verified = True
-                user.is_active = True
-                user.last_login = timezone.now()
-                user.save(update_fields=["email_verified", "is_active", "last_login"])
-
-                refresh = RefreshToken.for_user(user)
-                response_data.update(
-                    {
-                        "access_token": str(refresh.access_token),
-                        "refresh_token": str(refresh),
-                        "user_id": str(user.id),
-                        "email": user.email,
-                        "role": user.role,
-                    }
-                )
-
-                TokenService.create_refresh_token(user, response_data["refresh_token"])
-
-            return Response(response_data, status=status.HTTP_200_OK)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomTokenRefreshView(TokenRefreshView):
@@ -261,32 +186,3 @@ class UserProfilePhotoView(APIView):
             status=status.HTTP_200_OK,
         )
 
-
-class PasswordResetWithOTPView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    @swagger_auto_schema(
-        operation_description="Réinitialisation du mot de passe avec OTP",
-        request_body=PasswordResetWithOTPSerializer,
-        responses={
-            200: openapi.Response("Mot de passe réinitialisé avec succès"),
-            400: "OTP invalide ou expiré",
-        },
-    )
-    def post(self, request):
-        serializer = PasswordResetWithOTPSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        email = serializer.validated_data["email"]
-        code = serializer.validated_data["code"]
-        new_password = serializer.validated_data["new_password"]
-
-        user = OTPService.verify_otp(email, code, "password_reset")
-
-        if not user:
-            return Response({"error": "Code invalide ou expiré"}, status=status.HTTP_400_BAD_REQUEST)
-
-        user.set_password(new_password)
-        user.save()
-
-        return Response({"message": "Mot de passe réinitialisé avec succès"}, status=status.HTTP_200_OK)

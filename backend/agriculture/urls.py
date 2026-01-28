@@ -11,7 +11,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="agriculture API",
         default_version="v1",
-        description="agriculture backend - Users + OTP + JWT",
+        description="agriculture backend - Users + JWT",
         contact=openapi.Contact(email="contact@agriculture.local"),
         license=openapi.License(name="BSD License"),
     ),
