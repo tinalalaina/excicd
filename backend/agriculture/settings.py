@@ -162,6 +162,8 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "agriculture backend - Users + JWT",
     "VERSION": "v1",
     "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest",
+    "SWAGGER_UI_FAVICON_HREF": "https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/favicon-32x32.png",
     "SECURITY": [{"BearerAuth": []}],
     "SECURITY_SCHEMES": {
         "BearerAuth": {
